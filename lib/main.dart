@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:projekakhirpamp/features/dashboard/presentation/pages/main_navigation_page.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
       ),
       home: authProvider.currentUser == null
           ? const LoginPage()
-          : const ReservationListPage(),
+          : const MainNavigationPage(),
     );
   }
 }
