@@ -7,6 +7,7 @@ import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/reservation/presentation/providers/reservation_provider.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/reservation/presentation/pages/reservation_list_page.dart';
+import 'features/category_rack/presentation/providers/category_rack_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryRackProvider()),
       ],
       child: const MyApp(),
     ),

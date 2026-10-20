@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Import halaman milik Jack yang sudah selesai
 import '../../../reservation/presentation/pages/reservation_list_page.dart';
+import '../../../category_rack/presentation/pages/category_rack_list_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -24,8 +25,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     // Fitur 3: Reservasi Buku (Jack) -> Halaman Asli milik Jack
     const ReservationListPage(),
 
-    // Fitur 4: Kategori & Rak (Farah) -> Sementara Dummy Page
-    const DummyFeaturePage(title: 'Fitur 4: Kategori & Lokasi Rak', owner: 'Farah Fadhilah'),
+    // Fitur 4: Kategori & Rak (Farah)
+    const CategoryRackListPage(),
   ];
 
   @override
