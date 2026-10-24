@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-// Import halaman milik Jack yang sudah selesai
+import '../../../catalog/presentation/pages/book_list_page.dart';
 import '../../../reservation/presentation/pages/reservation_list_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -15,8 +14,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   // Daftar Halaman untuk tiap Fitur
   final List<Widget> _pages = [
-    // Fitur 1: Katalog Buku (Rafa) -> Sementara Dummy Page
-    const DummyFeaturePage(title: 'Fitur 1: Katalog Buku', owner: 'Rafa Maritza'),
+    // Fitur 1: Katalog Buku (Rafa)
+    const BookListPage(),
 
     // Fitur 2: Manajemen Anggota (Ghefira) -> Sementara Dummy Page
     const DummyFeaturePage(title: 'Fitur 2: Manajemen Anggota', owner: 'Ghefira Addien'),
