@@ -3,10 +3,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:projekakhirpamp/features/dashboard/presentation/pages/main_navigation_page.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/reservation/presentation/providers/reservation_provider.dart';
 import 'features/auth/presentation/pages/login_page.dart';
-import 'features/reservation/presentation/pages/reservation_list_page.dart';
+import 'features/member/presentation/providers/member_provider.dart';
 import 'features/category_rack/presentation/providers/category_rack_provider.dart';
 
 void main() async {
@@ -25,6 +26,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
         ChangeNotifierProvider(create: (_) => CategoryRackProvider()),
+        ChangeNotifierProvider(create: (_) => MemberProvider()),
       ],
       child: const MyApp(),
     ),
