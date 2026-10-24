@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../catalog/presentation/pages/book_list_page.dart';
 import '../../../reservation/presentation/pages/reservation_list_page.dart';
+import '../../../category_rack/presentation/pages/category_rack_list_page.dart';
+import '../../../member/presentation/pages/member_list_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -18,13 +20,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const BookListPage(),
 
     // Fitur 2: Manajemen Anggota (Ghefira) -> Sementara Dummy Page
-    const DummyFeaturePage(title: 'Fitur 2: Manajemen Anggota', owner: 'Ghefira Addien'),
+    const MemberListPage(),
 
     // Fitur 3: Reservasi Buku (Jack) -> Halaman Asli milik Jack
     const ReservationListPage(),
 
     // Fitur 4: Kategori & Rak (Farah) -> Sementara Dummy Page
-    const DummyFeaturePage(title: 'Fitur 4: Kategori & Lokasi Rak', owner: 'Farah Fadhilah'),
+    const CategoryRackListPage(),
   ];
 
   @override
