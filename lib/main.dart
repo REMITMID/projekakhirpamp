@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/reservation/presentation/providers/reservation_provider.dart';
 import 'features/auth/presentation/pages/login_page.dart';
-import 'features/catalog/presentation/providers/book_provider.dart';
+import 'features/reservation/presentation/pages/reservation_list_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
-        ChangeNotifierProvider(create: (_) => BookProvider()),
       ],
       child: const MyApp(),
     ),
