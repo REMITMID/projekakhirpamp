@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../catalog/presentation/pages/book_list_page.dart';
+
+// Import halaman milik Jack yang sudah selesai
 import '../../../reservation/presentation/pages/reservation_list_page.dart';
+import '../../../category_rack/presentation/pages/category_rack_list_page.dart';
+import '../../../member/presentation/pages/member_list_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -14,17 +17,20 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   // Daftar Halaman untuk tiap Fitur
   final List<Widget> _pages = [
-    // Fitur 1: Katalog Buku (Rafa)
-    const BookListPage(),
+    // Fitur 1: Katalog Buku (Rafa) -> Sementara Dummy Page
+    const DummyFeaturePage(
+      title: 'Fitur 1: Katalog Buku',
+      owner: 'Rafa Maritza',
+    ),
 
-    // Fitur 2: Manajemen Anggota (Ghefira) -> Sementara Dummy Page
-    const DummyFeaturePage(title: 'Fitur 2: Manajemen Anggota', owner: 'Ghefira Addien'),
+    // Fitur 2: Manajemen Anggota (Ghefira)
+    const MemberListPage(),
 
     // Fitur 3: Reservasi Buku (Jack) -> Halaman Asli milik Jack
     const ReservationListPage(),
 
-    // Fitur 4: Kategori & Rak (Farah) -> Sementara Dummy Page
-    const DummyFeaturePage(title: 'Fitur 4: Kategori & Lokasi Rak', owner: 'Farah Fadhilah'),
+    // Fitur 4: Kategori & Rak (Farah)
+    const CategoryRackListPage(),
   ];
 
   @override
@@ -72,11 +78,7 @@ class DummyFeaturePage extends StatelessWidget {
   final String title;
   final String owner;
 
-  const DummyFeaturePage({
-    super.key,
-    required this.title,
-    required this.owner,
-  });
+  const DummyFeaturePage({super.key, required this.title, required this.owner});
 
   @override
   Widget build(BuildContext context) {
@@ -88,11 +90,18 @@ class DummyFeaturePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.construction_rounded, size: 80, color: Colors.orange[400]),
+              Icon(
+                Icons.construction_rounded,
+                size: 80,
+                color: Colors.orange[400],
+              ),
               const SizedBox(height: 16),
               Text(
                 title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
@@ -102,7 +111,10 @@ class DummyFeaturePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.orange[50],
                   borderRadius: BorderRadius.circular(8),
