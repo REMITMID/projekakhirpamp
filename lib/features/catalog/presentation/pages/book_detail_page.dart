@@ -50,7 +50,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
             onPressed: () async {
               Navigator.pop(ctx);
               final provider =
-                  Provider.of<BookProvider>(context, listen: false);
+              Provider.of<BookProvider>(context, listen: false);
               final success = await provider.deleteBook(_currentBook.id!);
               if (!context.mounted) return;
 
@@ -122,7 +122,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               );
               if (result == true && mounted) {
                 final updated =
-                    bookProvider.getBookById(_currentBook.id ?? '');
+                bookProvider.getBookById(_currentBook.id ?? '');
                 if (updated != null) {
                   setState(() {
                     _currentBook = updated;
@@ -419,7 +419,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   );
                   if (result == true && mounted) {
                     final updated =
-                        bookProvider.getBookById(_currentBook.id ?? '');
+                    bookProvider.getBookById(_currentBook.id ?? '');
                     if (updated != null) {
                       setState(() {
                         _currentBook = updated;
@@ -497,30 +497,30 @@ class _BookDetailPageState extends State<BookDetailPage> {
           Expanded(
             child: isHighlighted
                 ? Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Colors.indigo.shade100),
-                    ),
-                    child: Text(
-                      value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.indigo,
-                        fontSize: 13,
-                      ),
-                    ),
-                  )
+              padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.indigo.shade50,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.indigo.shade100),
+              ),
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                  fontSize: 13,
+                ),
+              ),
+            )
                 : Text(
-                    value,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: Colors.black87,
+              ),
+            ),
           ),
         ],
       ),

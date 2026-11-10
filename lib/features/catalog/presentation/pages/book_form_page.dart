@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/book_model.dart';
 import '../providers/book_provider.dart';
+import '../../../category_rack/presentation/providers/category_rack_provider.dart';
 
 class BookFormPage extends StatefulWidget {
   final BookModel? book;
@@ -21,50 +22,11 @@ class _BookFormPageState extends State<BookFormPage> {
   late TextEditingController _publisherController;
   late TextEditingController _yearController;
   late TextEditingController _stockController;
-  late TextEditingController _customCategoryController;
-  late TextEditingController _customRackController;
-
   String? _selectedCategory;
   String? _selectedRack;
-  bool _isCustomCategory = false;
-  bool _isCustomRack = false;
 
   bool _isSubmitting = false;
   AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
-
-  static const List<String> _defaultCategories = [
-    'Fiksi',
-    'Non-Fiksi',
-    'Teknologi',
-    'Sains',
-    'Sejarah',
-    'Sastra',
-    'Bisnis',
-    'Pendidikan',
-    'Komik',
-    'Agama',
-    'Biografi',
-    'Kamus & Ensiklopedia',
-    'Lainnya (Ketik Manual)',
-  ];
-
-  static const List<String> _defaultRacks = [
-    'Rak A-1',
-    'Rak A-2',
-    'Rak B-1',
-    'Rak B-2',
-    'Rak C-1',
-    'Rak C-2',
-    'Rak D-1',
-    'Rak D-2',
-    'Lantai 2 - A',
-    'Lantai 2 - B',
-    'Lantai 2 - C',
-    'Lainnya (Ketik Manual)',
-  ];
-
-  late List<String> _categoriesList;
-  late List<String> _racksList;
 
   @override
   void initState() {
@@ -80,29 +42,18 @@ class _BookFormPageState extends State<BookFormPage> {
     _stockController = TextEditingController(
       text: widget.book != null ? widget.book!.stock.toString() : '',
     );
-    _customCategoryController = TextEditingController();
-    _customRackController = TextEditingController();
+    // Saat Edit, nilai buku lama disiapkan terlebih dahulu.
+    _selectedCategory = widget.book?.categoryId;
+    _selectedRack = widget.book?.rackId;
+    if (_selectedCategory?.isEmpty ?? false) _selectedCategory = null;
+    if (_selectedRack?.isEmpty ?? false) _selectedRack = null;
 
-    _categoriesList = List<String>.from(_defaultCategories);
-    _racksList = List<String>.from(_defaultRacks);
-
-    if (widget.book != null) {
-      final existingCat = widget.book!.category.trim();
-      if (existingCat.isNotEmpty) {
-        if (!_categoriesList.contains(existingCat)) {
-          _categoriesList.insert(_categoriesList.length - 1, existingCat);
-        }
-        _selectedCategory = existingCat;
+    // Memuat pilihan kategori dan rak dari Supabase setelah frame pertama.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<CategoryRackProvider>().fetchCategoryRacks();
       }
-
-      final existingRack = widget.book!.rackLocation.trim();
-      if (existingRack.isNotEmpty) {
-        if (!_racksList.contains(existingRack)) {
-          _racksList.insert(_racksList.length - 1, existingRack);
-        }
-        _selectedRack = existingRack;
-      }
-    }
+    });
   }
 
   @override
@@ -113,8 +64,6 @@ class _BookFormPageState extends State<BookFormPage> {
     _publisherController.dispose();
     _yearController.dispose();
     _stockController.dispose();
-    _customCategoryController.dispose();
-    _customRackController.dispose();
     super.dispose();
   }
 
@@ -147,19 +96,27 @@ class _BookFormPageState extends State<BookFormPage> {
           backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
       return;
     }
 
-    final finalCategory = _isCustomCategory
-        ? _customCategoryController.text.trim()
-        : (_selectedCategory ?? '').trim();
+    final referenceProvider = context.read<CategoryRackProvider>();
+    final finalCategory = _selectedCategory?.trim() ?? '';
+    final finalRack = _selectedRack?.trim() ?? '';
 
-    final finalRack = _isCustomRack
-        ? _customRackController.text.trim()
-        : (_selectedRack ?? '').trim();
+    // Validasi tambahan agar pasangan kategori-rak sesuai tabel referensi.
+    if (referenceProvider.isLoading ||
+        referenceProvider.errorMessage != null ||
+        !referenceProvider.isValidPair(finalCategory, finalRack)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pilih pasangan kategori dan rak yang terdaftar.'),
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _isSubmitting = true;
@@ -172,8 +129,8 @@ class _BookFormPageState extends State<BookFormPage> {
       author: _authorController.text.trim(),
       publisher: _publisherController.text.trim(),
       publicationYear: int.parse(_yearController.text.trim()),
-      category: finalCategory,
-      rackLocation: finalRack,
+      categoryId: finalCategory,
+      rackId: finalRack,
       stock: int.parse(_stockController.text.trim()),
     );
 
@@ -212,7 +169,7 @@ class _BookFormPageState extends State<BookFormPage> {
           backgroundColor: Colors.green.shade700,
           behavior: SnackBarBehavior.floating,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
       Navigator.pop(context, true);
@@ -233,7 +190,7 @@ class _BookFormPageState extends State<BookFormPage> {
           backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -243,6 +200,17 @@ class _BookFormPageState extends State<BookFormPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.book != null;
+
+    final referenceProvider = context.watch<CategoryRackProvider>();
+    final categoryOptions = referenceProvider.categories;
+    final validCategory = categoryOptions.any((c) => c.id == _selectedCategory)
+        ? _selectedCategory : null;
+    final rackOptions = referenceProvider.racksForCategory(validCategory);
+    final validRack = rackOptions.any((r) => r.id == _selectedRack)
+        ? _selectedRack : null;
+    final referenceReady = referenceProvider.hasLoaded &&
+        !referenceProvider.isLoading &&
+        referenceProvider.errorMessage == null;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -430,132 +398,101 @@ class _BookFormPageState extends State<BookFormPage> {
               icon: Icons.shelves,
               theme: theme,
               children: [
-                // Dropdown Kategori
+                // Referensi kategori/rak berasal dari categories, racks, category_racks.
+                if (!referenceProvider.hasLoaded || referenceProvider.isLoading) ...[
+                  const LinearProgressIndicator(),
+                  const SizedBox(height: 8),
+                  const Text('Memuat kategori dan lokasi rak...'),
+                  const SizedBox(height: 16),
+                ],
+                if (referenceProvider.errorMessage != null) ...[
+                  Text(
+                    'Gagal memuat kategori/rak: ${referenceProvider.errorMessage}',
+                    style: TextStyle(color: Colors.red.shade700),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => referenceProvider.fetchCategoryRacks(),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Coba Lagi'),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (referenceReady && categoryOptions.isEmpty) ...[
+                  const Text(
+                    'Belum ada kategori dan rak. Tambahkan dulu melalui fitur Category & Rack.',
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (widget.book != null &&
+                    referenceReady &&
+                    _selectedCategory != null &&
+                    validCategory == null) ...[
+                  const Text(
+                    'Kategori lama buku ini tidak ada di data referensi. Pilih kategori yang tersedia.',
+                    style: TextStyle(color: Colors.deepOrange),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
+                // Dropdown 1: ID kategori dari tabel categories.
                 DropdownButtonFormField<String>(
-                  value: _selectedCategory,
+                  key: ValueKey('category-$validCategory-${categoryOptions.length}'),
+                  initialValue: validCategory,
+                  isExpanded: true,
                   decoration: _buildInputDecoration(
                     labelText: 'Kategori Buku *',
                     hintText: 'Pilih Kategori',
                     icon: Icons.category_rounded,
                   ),
-                  items: _categoriesList.map((cat) {
-                    final isManual = cat == 'Lainnya (Ketik Manual)';
-                    return DropdownMenuItem<String>(
-                      value: cat,
-                      child: Text(
-                        cat,
-                        style: TextStyle(
-                          color: isManual ? Colors.indigo : Colors.black87,
-                          fontStyle:
-                              isManual ? FontStyle.italic : FontStyle.normal,
-                          fontWeight:
-                              isManual ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedCategory = val;
-                      _isCustomCategory = (val == 'Lainnya (Ketik Manual)');
-                    });
-                  },
-                  validator: (val) {
-                    if (val == null || val.trim().isEmpty) {
-                      return 'Kategori wajib dipilih';
-                    }
-                    return null;
-                  },
+                  items: categoryOptions.map((cat) => DropdownMenuItem<String>(
+                    value: cat.id,
+                    child: Text(cat.name, overflow: TextOverflow.ellipsis),
+                  )).toList(),
+                  onChanged: referenceReady && categoryOptions.isNotEmpty
+                      ? (value) => setState(() {
+                    _selectedCategory = value;
+                    _selectedRack = null;
+                  })
+                      : null,
+                  validator: (value) =>
+                  value == null || !categoryOptions.any((c) => c.id == value)
+                      ? 'Kategori wajib dipilih'
+                      : null,
                 ),
-
-                // Jika memilih 'Lainnya (Ketik Manual)'
-                if (_isCustomCategory) ...[
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _customCategoryController,
-                    textCapitalization: TextCapitalization.words,
-                    decoration: _buildInputDecoration(
-                      labelText: 'Ketik Kategori Baru *',
-                      hintText: 'Contoh: Ensiklopedia Sains',
-                      icon: Icons.edit_note_rounded,
-                    ),
-                    validator: (val) {
-                      if (_isCustomCategory) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Kategori baru wajib diisi';
-                        }
-                        if (val.trim().length < 2) {
-                          return 'Kategori minimal 2 karakter';
-                        }
-                      }
-                      return null;
-                    },
-                  ),
-                ],
                 const SizedBox(height: 16),
-
-                // Dropdown Lokasi Rak
+                if (widget.book != null && referenceReady &&
+                    validCategory != null && _selectedRack != null &&
+                    validRack == null) ...[
+                  const Text('Rak lama tidak tersedia untuk kategori ini.',
+                      style: TextStyle(color: Colors.deepOrange)),
+                  const SizedBox(height: 12),
+                ],
+                // Dropdown 2: hanya ID rak yang tercantum di category_racks.
                 DropdownButtonFormField<String>(
-                  value: _selectedRack,
+                  key: ValueKey('rack-$validCategory-$validRack-${rackOptions.length}'),
+                  initialValue: validRack,
+                  isExpanded: true,
                   decoration: _buildInputDecoration(
                     labelText: 'Lokasi Rak *',
-                    hintText: 'Pilih Lokasi Rak',
+                    hintText: validCategory == null
+                        ? 'Pilih kategori terlebih dahulu'
+                        : 'Pilih Lokasi Rak',
                     icon: Icons.location_on_outlined,
                   ),
-                  items: _racksList.map((rack) {
-                    final isManual = rack == 'Lainnya (Ketik Manual)';
-                    return DropdownMenuItem<String>(
-                      value: rack,
-                      child: Text(
-                        rack,
-                        style: TextStyle(
-                          color: isManual ? Colors.indigo : Colors.black87,
-                          fontStyle:
-                              isManual ? FontStyle.italic : FontStyle.normal,
-                          fontWeight:
-                              isManual ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedRack = val;
-                      _isCustomRack = (val == 'Lainnya (Ketik Manual)');
-                    });
-                  },
-                  validator: (val) {
-                    if (val == null || val.trim().isEmpty) {
-                      return 'Lokasi rak wajib dipilih';
-                    }
-                    return null;
-                  },
+                  items: rackOptions.map((rack) => DropdownMenuItem<String>(
+                    value: rack.id,
+                    child: Text(rack.displayName,
+                        overflow: TextOverflow.ellipsis),
+                  )).toList(),
+                  onChanged: referenceReady && validCategory != null &&
+                      rackOptions.isNotEmpty
+                      ? (value) => setState(() => _selectedRack = value)
+                      : null,
+                  validator: (value) => value == null ||
+                      !rackOptions.any((r) => r.id == value)
+                      ? 'Pilih lokasi rak yang sesuai dengan kategori'
+                      : null,
                 ),
-
-                // Jika memilih 'Lainnya (Ketik Manual)'
-                if (_isCustomRack) ...[
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _customRackController,
-                    textCapitalization: TextCapitalization.characters,
-                    decoration: _buildInputDecoration(
-                      labelText: 'Ketik Lokasi Rak Baru *',
-                      hintText: 'Contoh: Rak E-01, Lantai 3',
-                      icon: Icons.add_location_alt_outlined,
-                    ),
-                    validator: (val) {
-                      if (_isCustomRack) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Lokasi rak baru wajib diisi';
-                        }
-                        if (val.trim().length < 2) {
-                          return 'Lokasi rak minimal 2 karakter';
-                        }
-                      }
-                      return null;
-                    },
-                  ),
-                ],
                 const SizedBox(height: 16),
 
                 // Tahun Terbit & Stok dalam 2 Kolom
@@ -704,21 +641,21 @@ class _BookFormPageState extends State<BookFormPage> {
                     ),
                     icon: _isSubmitting
                         ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
                         : Icon(isEdit ? Icons.save_rounded : Icons.add_rounded),
                     label: Text(
                       _isSubmitting
                           ? 'Menyimpan...'
                           : isEdit
-                              ? 'Simpan Perubahan'
-                              : 'Tambah Buku',
+                          ? 'Simpan Perubahan'
+                          : 'Tambah Buku',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
