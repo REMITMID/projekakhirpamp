@@ -1,29 +1,19 @@
+/// Referensi pasangan kategori-rak yang boleh dipilih ketika menyimpan buku.
 class CategoryRackModel {
   final String id;
-  final String categoryName;
-  final String rackLocation;
-  final DateTime createdAt;
+  final String categoryId;
+  final String rackId;
 
-  CategoryRackModel({
+  const CategoryRackModel({
     required this.id,
-    required this.categoryName,
-    required this.rackLocation,
-    required this.createdAt,
+    required this.categoryId,
+    required this.rackId,
   });
 
-  factory CategoryRackModel.fromJson(Map<String, dynamic> json) {
-    return CategoryRackModel(
-      id: json['id'],
-      categoryName: json['category_name'],
-      rackLocation: json['rack_location'],
-      createdAt: DateTime.parse(json['created_at']),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'category_name': categoryName,
-      'rack_location': rackLocation,
-    };
-  }
+  factory CategoryRackModel.fromJson(Map<String, dynamic> json) =>
+      CategoryRackModel(
+        id: json['id'] as String,
+        categoryId: json['category_id'] as String,
+        rackId: json['rack_id'] as String,
+      );
 }

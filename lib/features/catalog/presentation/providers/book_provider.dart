@@ -3,7 +3,9 @@ import '../../data/book_repository.dart';
 import '../../domain/models/book_model.dart';
 
 class BookProvider extends ChangeNotifier {
-  final BookRepository _repository = BookRepository();
+  final BookRepository _repository;
+  BookProvider({BookRepository? repository})
+      : _repository = repository ?? BookRepository();
 
   List<BookModel> _books = [];
   bool _isLoading = false;

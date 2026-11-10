@@ -2,169 +2,163 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/category_rack_provider.dart';
 import 'category_rack_form_page.dart';
+import 'category_rack_mapping_page.dart';
 
+/// Sesuai proposal: dua tab master Kategori dan Rak.
 class CategoryRackListPage extends StatefulWidget {
   const CategoryRackListPage({super.key});
-
   @override
   State<CategoryRackListPage> createState() => _CategoryRackListPageState();
 }
 
-class _CategoryRackListPageState extends State<CategoryRackListPage> {
+class _CategoryRackListPageState extends State<CategoryRackListPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-          () => context.read<CategoryRackProvider>().fetchCategories(),
-    );
+    _tabs = TabController(length: 2, vsync: this);
+    _tabs.addListener(() { if (mounted) setState(() {}); });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<CategoryRackProvider>().fetchCategoryRacks();
+    });
   }
 
-  // Dialog Konfirmasi Hapus Data
-  void _showDeleteDialog(BuildContext context, String id) {
-    showDialog(
+  @override
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
+
+  Future<void> _delete({String? categoryId, String? rackId}) async {
+    final category = categoryId != null;
+    final name = category ? 'kategori' : 'rak';
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Konfirmasi Hapus'),
-        content: const Text('Apakah Anda yakin ingin menghapus data kategori & rak ini?'),
+        title: Text('Hapus $name?'),
+        content: Text('Data $name tidak dapat dihapus jika masih dipakai buku atau penempatan.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<CategoryRackProvider>().deleteCategory(id);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Kategori berhasil dihapus'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            child: const Text('Ya, Hapus'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Batal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Hapus')),
         ],
       ),
     );
+    if (confirm != true || !mounted) return;
+    final p = context.read<CategoryRackProvider>();
+    final ok = category
+        ? await p.deleteCategory(categoryId!)
+        : await p.deleteRack(rackId!);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(ok ? 'Data $name berhasil dihapus.'
+          : p.errorMessage ?? 'Gagal menghapus $name.'),
+      backgroundColor: ok ? Colors.green : Colors.red,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF4E5BA6);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Manajemen Kategori & Rak',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        elevation: 0,
+        title: const Text('Manajemen Kategori & Rak'),
+        actions: [
+          IconButton(
+            tooltip: 'Segarkan', icon: const Icon(Icons.refresh),
+            onPressed: () => context.read<CategoryRackProvider>().fetchCategoryRacks(),
+          ),
+        ],
+        bottom: TabBar(controller: _tabs, tabs: const [
+          Tab(text: 'Kategori', icon: Icon(Icons.category_outlined)),
+          Tab(text: 'Rak', icon: Icon(Icons.shelves)),
+        ]),
       ),
-      body: Consumer<CategoryRackProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: primaryColor),
-            );
-          }
-
-          // Tampilan jika data kosong
-          if (provider.categories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.grid_view_outlined,
-                    size: 70,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Belum ada data kategori.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          // Tampilan Daftar Kartu Kategori
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: provider.categories.length,
-            itemBuilder: (context, index) {
-              final item = provider.categories[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: CircleAvatar(
-                    backgroundColor: primaryColor.withOpacity(0.1),
-                    child: const Icon(Icons.category_outlined, color: primaryColor),
-                  ),
-                  title: Text(
-                    item.categoryName,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  subtitle: Text(
-                    'Lokasi: ${item.rackLocation}',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, color: Colors.blue),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CategoryRackFormPage(category: item),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
-                        onPressed: () => _showDeleteDialog(context, item.id),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CategoryRackFormPage()),
-          );
-        },
+      body: Consumer<CategoryRackProvider>(builder: (context, p, _) {
+        if (p.isLoading && !p.hasLoaded) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (p.errorMessage != null && !p.hasLoaded) {
+          return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(padding: const EdgeInsets.all(20), child: Text(p.errorMessage!)),
+            TextButton(onPressed: p.fetchCategoryRacks, child: const Text('Coba Lagi')),
+          ]));
+        }
+        return TabBarView(controller: _tabs, children: [
+          _categoryList(p),
+          _rackList(p),
+        ]);
+      }),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'add-master',
+        onPressed: () => Navigator.push(context, MaterialPageRoute(
+          builder: (_) => CategoryRackFormPage(
+            type: _tabs.index == 0 ? MasterFormType.category : MasterFormType.rack,
+          ),
+        )),
+        icon: const Icon(Icons.add),
+        label: Text(_tabs.index == 0 ? 'Tambah Kategori' : 'Tambah Rak'),
       ),
     );
+  }
+
+  Widget _categoryList(CategoryRackProvider p) {
+    return ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 92), children: [
+      if (p.categories.isEmpty) const Padding(
+        padding: EdgeInsets.all(18), child: Text('Belum ada kategori.'),
+      ),
+      ...p.categories.map((c) => Card(child: ListTile(
+        leading: const Icon(Icons.category_outlined),
+        title: Text(c.name),
+        subtitle: Text(c.description ?? 'Tanpa deskripsi'),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          IconButton(tooltip: 'Edit kategori', icon: const Icon(Icons.edit),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CategoryRackFormPage(
+                  type: MasterFormType.category, category: c),
+            )),
+          ),
+          IconButton(tooltip: 'Hapus kategori',
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: p.isSaving ? null : () => _delete(categoryId: c.id),
+          ),
+        ]),
+      ))),
+    ]);
+  }
+
+  Widget _rackList(CategoryRackProvider p) {
+    return ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 92), children: [
+      FilledButton.tonalIcon(
+        icon: const Icon(Icons.link),
+        label: const Text('Kelola Penempatan Kategori–Rak'),
+        onPressed: () => Navigator.push(context, MaterialPageRoute(
+          builder: (_) => const CategoryRackMappingPage(),
+        )),
+      ),
+      const SizedBox(height: 12),
+      if (p.racks.isEmpty) const Padding(
+        padding: EdgeInsets.all(18), child: Text('Belum ada rak.'),
+      ),
+      ...p.racks.map((r) => Card(child: ListTile(
+        leading: const Icon(Icons.shelves),
+        title: Text(r.rackCode),
+        subtitle: Text(r.location),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          IconButton(tooltip: 'Edit rak', icon: const Icon(Icons.edit),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(
+              builder: (_) => CategoryRackFormPage(
+                  type: MasterFormType.rack, rack: r),
+            )),
+          ),
+          IconButton(tooltip: 'Hapus rak',
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: p.isSaving ? null : () => _delete(rackId: r.id),
+          ),
+        ]),
+      ))),
+    ]);
   }
 }

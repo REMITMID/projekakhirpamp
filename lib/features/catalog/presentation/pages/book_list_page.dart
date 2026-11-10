@@ -67,7 +67,7 @@ class _BookListPageState extends State<BookListPage> {
             onPressed: () async {
               Navigator.pop(ctx);
               final provider =
-                  Provider.of<BookProvider>(context, listen: false);
+              Provider.of<BookProvider>(context, listen: false);
               final success = await provider.deleteBook(book.id!);
               if (!context.mounted) return;
 
@@ -133,7 +133,7 @@ class _BookListPageState extends State<BookListPage> {
     final totalTitles = bookProvider.books.length;
     final totalStock = bookProvider.books.fold<int>(
       0,
-      (sum, item) => sum + item.stock,
+          (sum, item) => sum + item.stock,
     );
     final outOfStockCount =
         bookProvider.books.where((b) => b.stock <= 0).length;
@@ -198,20 +198,20 @@ class _BookListPageState extends State<BookListPage> {
                   decoration: InputDecoration(
                     hintText: 'Cari judul, penulis, kode, atau rak...',
                     hintStyle:
-                        TextStyle(fontSize: 14, color: Colors.grey.shade500),
+                    TextStyle(fontSize: 14, color: Colors.grey.shade500),
                     prefixIcon:
-                        const Icon(Icons.search_rounded, color: Colors.grey),
+                    const Icon(Icons.search_rounded, color: Colors.grey),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded,
-                                color: Colors.grey),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {
-                                _searchQuery = '';
-                              });
-                            },
-                          )
+                      icon: const Icon(Icons.clear_rounded,
+                          color: Colors.grey),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {
+                          _searchQuery = '';
+                        });
+                      },
+                    )
                         : null,
                     filled: true,
                     fillColor: Colors.grey.shade100,
@@ -238,10 +238,10 @@ class _BookListPageState extends State<BookListPage> {
                         final count = cat == 'Semua'
                             ? bookProvider.books.length
                             : bookProvider.books
-                                .where((b) =>
-                                    b.category.trim().toLowerCase() ==
-                                    cat.trim().toLowerCase())
-                                .length;
+                            .where((b) =>
+                        b.category.trim().toLowerCase() ==
+                            cat.trim().toLowerCase())
+                            .length;
 
                         return ChoiceChip(
                           label: Text('$cat ($count)'),
@@ -300,7 +300,7 @@ class _BookListPageState extends State<BookListPage> {
                   const Spacer(),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.indigo.shade50,
                       borderRadius: BorderRadius.circular(6),
@@ -341,25 +341,25 @@ class _BookListPageState extends State<BookListPage> {
           Expanded(
             child: bookProvider.isLoading
                 ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Memuat katalog buku...'),
-                      ],
-                    ),
-                  )
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Memuat katalog buku...'),
+                ],
+              ),
+            )
                 : bookProvider.errorMessage != null
-                    ? _buildErrorView(bookProvider)
-                    : filteredBooks.isEmpty
-                        ? _buildEmptyView(bookProvider.books.isEmpty)
-                        : RefreshIndicator(
-                            onRefresh: () => bookProvider.fetchBooks(),
-                            child: bookProvider.isGridView
-                                ? _buildGridView(filteredBooks, theme)
-                                : _buildListView(filteredBooks, theme),
-                          ),
+                ? _buildErrorView(bookProvider)
+                : filteredBooks.isEmpty
+                ? _buildEmptyView(bookProvider.books.isEmpty)
+                : RefreshIndicator(
+              onRefresh: () => bookProvider.fetchBooks(),
+              child: bookProvider.isGridView
+                  ? _buildGridView(filteredBooks, theme)
+                  : _buildListView(filteredBooks, theme),
+            ),
           ),
         ],
       ),
@@ -502,7 +502,7 @@ class _BookListPageState extends State<BookListPage> {
           margin: const EdgeInsets.only(bottom: 12),
           elevation: 1.5,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           color: Colors.white,
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
@@ -613,7 +613,7 @@ class _BookListPageState extends State<BookListPage> {
                                 color: Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(4),
                                 border:
-                                    Border.all(color: Colors.grey.shade300),
+                                Border.all(color: Colors.grey.shade300),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -709,7 +709,7 @@ class _BookListPageState extends State<BookListPage> {
         return Card(
           elevation: 1.5,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           color: Colors.white,
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
