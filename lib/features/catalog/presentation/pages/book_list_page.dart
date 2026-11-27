@@ -702,7 +702,7 @@ class _BookListPageState extends State<BookListPage> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: columnCount,
-        mainAxisExtent: 192.0 + extraTextHeight.toDouble(),
+        mainAxisExtent: 216.0 + extraTextHeight.toDouble(),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -723,62 +723,73 @@ class _BookListPageState extends State<BookListPage> {
               MaterialPageRoute(builder: (_) => BookDetailPage(book: book)),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Ikon, kode buku, dan stok
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.menu_book_rounded,
-                        color: theme.colorScheme.primary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              book.bookCode,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
+                  Ink(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.55),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    book.bookCode,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: stockColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                book.stock > 0 ? '${book.stock}' : '0',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: stockColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: stockColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(6),
+                        const SizedBox(height: 4),
+                        Icon(
+                          Icons.menu_book_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 26,
                         ),
-                        child: Text(
-                          book.stock > 0 ? '${book.stock}' : '0',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: stockColor,
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // Judul Buku
                   Text(
@@ -825,7 +836,7 @@ class _BookListPageState extends State<BookListPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const Spacer(),
 
                   // Aksi Tombol Edit & Hapus
                   Container(
@@ -834,7 +845,7 @@ class _BookListPageState extends State<BookListPage> {
                         top: BorderSide(color: Colors.grey.shade200),
                       ),
                     ),
-                    padding: const EdgeInsets.only(top: 4),
+                    padding: const EdgeInsets.only(top: 2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
