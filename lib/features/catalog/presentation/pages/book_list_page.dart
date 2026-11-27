@@ -775,7 +775,7 @@ class _BookListPageState extends State<BookListPage> {
                   // Banner Icon Buku
                   Center(
                     child: Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
@@ -783,7 +783,7 @@ class _BookListPageState extends State<BookListPage> {
                       child: Icon(
                         Icons.menu_book_rounded,
                         color: theme.colorScheme.primary,
-                        size: 28,
+                        size: 24,
                       ),
                     ),
                   ),
@@ -800,7 +800,7 @@ class _BookListPageState extends State<BookListPage> {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 1),
 
                   // Penulis
                   Text(
@@ -810,10 +810,11 @@ class _BookListPageState extends State<BookListPage> {
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 11,
+                      height: 1.1,
                     ),
                   ),
 
-                  const Spacer(),
+                  const SizedBox(height: 6),
 
                   // Lokasi Rak
                   Row(
