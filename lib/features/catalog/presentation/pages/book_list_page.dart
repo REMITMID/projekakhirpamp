@@ -693,11 +693,16 @@ class _BookListPageState extends State<BookListPage> {
   }
 
   Widget _buildGridView(List<BookModel> books, ThemeData theme) {
+    final columnCount = MediaQuery.sizeOf(context).width >= 900 ? 4 : 2;
+    final textScaler = MediaQuery.textScalerOf(context);
+    final extraTextHeight =
+        (textScaler.scale(66) - 66).clamp(0.0, double.infinity).toDouble();
+
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.72,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columnCount,
+        mainAxisExtent: 208.0 + extraTextHeight,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -722,26 +727,31 @@ class _BookListPageState extends State<BookListPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Kartu: Kode Buku & Kategori Chip
+                  // Kode buku dan jumlah stok
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          book.bookCode,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            book.bookCode,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
