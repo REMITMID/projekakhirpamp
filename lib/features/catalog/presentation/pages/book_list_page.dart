@@ -506,7 +506,8 @@ class _BookListPageState extends State<BookListPage> {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           elevation: 2,
-          color: colors.surfaceContainerLow,
+          color: Colors.white,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
