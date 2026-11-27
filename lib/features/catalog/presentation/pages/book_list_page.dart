@@ -693,11 +693,16 @@ class _BookListPageState extends State<BookListPage> {
   }
 
   Widget _buildGridView(List<BookModel> books, ThemeData theme) {
+    final columnCount = MediaQuery.sizeOf(context).width >= 800 ? 4 : 2;
+    final textScaler = MediaQuery.textScalerOf(context);
+    final extraTextHeight =
+        (textScaler.scale(90) - 90).clamp(0.0, double.infinity);
+
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.72,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columnCount,
+        mainAxisExtent: 192.0 + extraTextHeight.toDouble(),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -722,26 +727,39 @@ class _BookListPageState extends State<BookListPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header Kartu: Kode Buku & Kategori Chip
+                  // Ikon, kode buku, dan stok
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          book.bookCode,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                      Icon(
+                        Icons.menu_book_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              book.bookCode,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
@@ -760,24 +778,7 @@ class _BookListPageState extends State<BookListPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-
-                  // Banner Icon Buku
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.menu_book_rounded,
-                        color: theme.colorScheme.primary,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
                   // Judul Buku
                   Text(
@@ -790,7 +791,7 @@ class _BookListPageState extends State<BookListPage> {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 2),
 
                   // Penulis
                   Text(
@@ -803,7 +804,7 @@ class _BookListPageState extends State<BookListPage> {
                     ),
                   ),
 
-                  const Spacer(),
+                  const SizedBox(height: 6),
 
                   // Lokasi Rak
                   Row(
@@ -814,7 +815,7 @@ class _BookListPageState extends State<BookListPage> {
                       Expanded(
                         child: Text(
                           book.rackLocation,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 10,
