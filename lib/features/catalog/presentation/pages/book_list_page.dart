@@ -693,16 +693,11 @@ class _BookListPageState extends State<BookListPage> {
   }
 
   Widget _buildGridView(List<BookModel> books, ThemeData theme) {
-    final columnCount = MediaQuery.sizeOf(context).width >= 900 ? 4 : 2;
-    final textScaler = MediaQuery.textScalerOf(context);
-    final extraTextHeight =
-        (textScaler.scale(66) - 66).clamp(0.0, double.infinity).toDouble();
-
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: columnCount,
-        mainAxisExtent: 208.0 + extraTextHeight,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.72,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -727,31 +722,26 @@ class _BookListPageState extends State<BookListPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Kode buku dan jumlah stok
+                  // Header Kartu: Kode Buku & Kategori Chip
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            book.bookCode,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          book.bookCode,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
@@ -775,7 +765,7 @@ class _BookListPageState extends State<BookListPage> {
                   // Banner Icon Buku
                   Center(
                     child: Container(
-                      padding: const EdgeInsets.all(7),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
@@ -783,7 +773,7 @@ class _BookListPageState extends State<BookListPage> {
                       child: Icon(
                         Icons.menu_book_rounded,
                         color: theme.colorScheme.primary,
-                        size: 24,
+                        size: 28,
                       ),
                     ),
                   ),
@@ -800,7 +790,7 @@ class _BookListPageState extends State<BookListPage> {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 3),
 
                   // Penulis
                   Text(
@@ -810,11 +800,10 @@ class _BookListPageState extends State<BookListPage> {
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 11,
-                      height: 1.1,
                     ),
                   ),
 
-                  const SizedBox(height: 6),
+                  const Spacer(),
 
                   // Lokasi Rak
                   Row(
