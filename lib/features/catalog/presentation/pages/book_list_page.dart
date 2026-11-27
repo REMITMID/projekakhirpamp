@@ -491,6 +491,8 @@ class _BookListPageState extends State<BookListPage> {
   }
 
   Widget _buildListView(List<BookModel> books, ThemeData theme) {
+    final colors = theme.colorScheme;
+
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
       itemCount: books.length,
@@ -499,189 +501,93 @@ class _BookListPageState extends State<BookListPage> {
         final stockColor = _getStockColor(book.stock);
 
         return Card(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: 10),
           elevation: 1.5,
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           color: Colors.white,
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
-            borderRadius: BorderRadius.circular(14),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => BookDetailPage(book: book)),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(14.0),
+            child: IntrinsicHeight(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Icon Cover Buku dengan Badge Kode
-                  Container(
-                    width: 50,
-                    height: 65,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.book_rounded,
-                          color: theme.colorScheme.primary,
-                          size: 26,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          book.bookCode,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-
-                  // Informasi Buku
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          book.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 12, 12, 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            book.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.person_outline_rounded,
-                                size: 14, color: Colors.grey.shade600),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                book.author,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.grey.shade700,
-                                  fontSize: 13,
-                                ),
-                              ),
+                          const SizedBox(height: 2),
+                          Text(
+                            book.author,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-
-                        // Badges Kategori, Lokasi Rak & Stok
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: [
-                            // Kategori
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary
-                                    .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                book.category,
-                                style: TextStyle(
-                                  color: theme.colorScheme.primary,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            book.rackLocation,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
                             ),
-                            // Lokasi Rak
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(4),
-                                border:
-                                Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.shelves,
-                                      size: 11, color: Colors.black54),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    book.rackLocation,
-                                    style: const TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: 11,
-                                    ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            book.stock > 0 ? 'Stok: ${book.stock}' : 'Stok habis',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: stockColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                tooltip: 'Edit buku',
+                                color: colors.primary,
+                                icon: const Icon(Icons.edit_outlined, size: 20),
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => BookFormPage(book: book),
                                   ),
-                                ],
-                              ),
-                            ),
-                            // Stok
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: stockColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                book.stock > 0
-                                    ? 'Stok: ${book.stock}'
-                                    : 'Habis',
-                                style: TextStyle(
-                                  color: stockColor,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              IconButton(
+                                tooltip: 'Hapus buku',
+                                color: colors.error,
+                                icon: const Icon(Icons.delete_outline, size: 20),
+                                onPressed: () => _confirmDelete(context, book),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-
-                  // Aksi Tombol Cepat (Edit & Hapus)
-                  Column(
-                    children: [
-                      IconButton(
-                        tooltip: 'Edit Buku',
-                        constraints: const BoxConstraints(),
-                        padding: const EdgeInsets.all(6),
-                        icon: const Icon(Icons.edit_outlined,
-                            size: 20, color: Colors.blueAccent),
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => BookFormPage(book: book),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      IconButton(
-                        tooltip: 'Hapus Buku',
-                        constraints: const BoxConstraints(),
-                        padding: const EdgeInsets.all(6),
-                        icon: const Icon(Icons.delete_outline,
-                            size: 20, color: Colors.redAccent),
-                        onPressed: () => _confirmDelete(context, book),
-                      ),
-                    ],
+                  Ink(
+                    width: 76,
+                    color: colors.primaryContainer.withValues(alpha: 0.6),
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      size: 30,
+                      color: colors.primary,
+                    ),
                   ),
                 ],
               ),
